@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Grade Calculator
+    </title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="https://cdn.icon-icons.com/icons2/1179/PNG/512/1490127523-school-object-study-student3_82096.png" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <h1>Grade Calculator</h1>
+    </header>
+    <br>
+    <a href="."><button>Back</button></a>
+    <table id="results" style="top: 500px; left: 169px;">
+        <thead>
+            <tr>
+                <td colspan="2">Overall Results</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="display: flex; justify-content:center; align-items: center;">
+                    <div class="progress-bar">
+                        <h1 id="num">100</h1><p id="topLim">/100</p>
+                      </div>
+                </td>
+            </tr>
+            <tr>
+                <td>Passing Grade</td>
+            </tr>
+            <tr>
+                <td contenteditable="true" id="minGrade">69</td>
+            </tr>
+            <tr>
+                <td>Max Grade</td>
+            </tr>
+            <tr>
+                <td contenteditable="true" id="maxGrade">100</td>
+            </tr>
+        </tbody>
+    </table>
+    <table id="percentages" style="top: 200px; left: 100px;">
+        <thead>
+            <tr>
+                <td colspan="2">Percentages</td>
+            </tr>
+            <tr>
+                <td>Evaluation</td>
+                <td>%</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Exam</td>
+                <td>100</td>
+            </tr>
+        </tbody>
+        <tfoot></tfoot>
+    </table>
+    <script defer>
+        function addGrade(table){
+            tr = document.createElement("tr")
+            tr.innerHTML = "<td contenteditable='true'>100</td>"
+            tr.children[0].onclick = ()=>{
+                document.body.onkeyup = ()=>{
+                    calculate()
+                    if(tr.children[0].innerHTML == ""){
+                        table.children[1].removeChild(tr);
+                    }
+                }
+            }
+            table.children[1].appendChild(tr)
+        }
+        function addButton(id, content, table, onclick){
+            let button = document.createElement("button")
+            button.innerHTML = content;
+            button.id = id;
+            button.onclick = ()=>{onclick(table)};
+            table.getElementsByTagName("tfoot")[0].appendChild(button);
+        }
+        function deleteButton(id){
+            document.getElementById(id).parentElement.removeChild(
+                document.getElementById(id)
+            );
+        }
+        function calculate(){
+            let tables = document.getElementsByClassName("t");
+            let finalVal = 0;
+            for (let i = 0; i < tables.length; i++){
+                let current = 0;
+                let body = tables[i].children[1].children;
+                for (let j = 0; j < body.length; j++){
+                    if (body[j].children[0].innerHTML == ""){
+                        tables[i].children[1].removeChild(body[j]);
+                    }
+                    current = current + +body[j].children[0].innerHTML;
+                }
+                let percentage = document.getElementById("percentages").getElementsByTagName("tbody")[0].children;
+                for (let j = 0; j < percentage.length; j++){
+                    if (percentage[j].children[0].innerHTML == tables[i].id){
+                        percentage = +percentage[j].children[1].innerHTML;
+                    }
+                }
+                current = (current / body.length) * (percentage/100);
+                finalVal = finalVal + current;
+            }
+            let color;
+            let max = +document.getElementById("maxGrade").innerHTML;
+            console.log(max);
+            let finalCopy = Math.floor(finalVal*100)/100;
+            if (finalVal >= +document.getElementById("minGrade").innerHTML.replace("<br>", "")){
+                color = "green";
+            }else{
+                color = "red";
+            }
+            finalVal = Math.floor((finalVal/max)*10000)/100;
+            document.getElementsByClassName("progress-bar")[0].style.background = "radial-gradient(closest-side, var(--bg) 79%, transparent 80% 100%), conic-gradient(" +
+            color
+            + " " +
+            finalVal +
+            "%, lightgray 0)"
+            document.getElementById("num").innerText = finalCopy;
+            document.getElementById("topLim").innerText = "/" + max;
+
+        }
+        function createTable(name, headers, content){
+            if (document.getElementById(name)){
+                return
+            }
+            let table = document.createElement("table");
+            table.style.top = 200 + Math.floor(Math.random()*(window.innerHeight-250))+"px";
+            table.style.left= Math.floor(Math.random()*(window.innerWidth-250)) + "px";
+            table.classList.add("t");
+            table.id = name;
+            let thead = "<thead><tr><td colspan='" +
+                headers.length + "'>" + name +
+                "</td></tr><tr>"
+            for (let i = 0; i < headers.length; i++){
+                thead = thead + "<td>" + headers[i] + "</td>";
+            }
+            thead = thead + "</tr></thead><tbody>";
+            for (let i = 0; i < content.length; i++){
+                thead = thead + "<tr>";
+                for (let j = 0; j < content[i].length; j++){
+                    thead = thead + "<td contenteditable>" + content[i][j] + "</td>"
+                }
+                thead = thead + "</tr>"
+            }
+            thead = thead + "</tbody><tfoot></tfoot>"
+            table.innerHTML = thead;
+            table.children[1].children[0].children[0].onclick = ()=>{
+                document.body.onkeyup = calculate;
+            }
+            addButton(name + "-button", "+", table, addGrade);
+            document.body.appendChild(table);
+        }
+        function deleteTables(existent){
+            const tables = document.getElementsByClassName("t");
+            for (let i = 0; i < tables.length; i++){
+                if (!existent.includes(tables[i].id)){
+                    document.body.removeChild(tables[i]);
+                }
+            }
+        }
+        function createTables(){
+            let percentageTable = document.getElementById("percentages").getElementsByTagName("tbody")[0];
+            percentageTable = percentageTable.getElementsByTagName("tr");
+            let existent = [];
+            for (let i = 0; i < percentageTable.length; i++){
+                let tname = percentageTable[i].getElementsByTagName("td")[0].innerHTML;
+                existent.push(tname);
+                createTable(tname, ["grade"], [["100"]]);
+                const editable = percentageTable[i].getElementsByTagName("td");
+                for (let j = 0; j < editable.length; j++){
+                    editable[j].contentEditable = "true";
+                }
+                editable[0].onclick = ()=>{
+                    document.body.onkeyup = (ev)=>{
+                        setTables()
+                    }
+                }
+                editable[1].onclick = ()=>{
+                    document.body.onkeyup = ()=>{
+                        calculate()
+                        percentageAdd = 0;
+                        for (let i = 0; i < percentageTable.length; i++){
+                            if (percentageAdd >= 100){
+                                document.getElementById("percentages").getElementsByTagName("tbody")[0].removeChild(percentageTable[i]);
+                                continue;
+                            }
+                            percentageAdd = percentageAdd + +percentageTable[i].getElementsByTagName("td")[1].innerHTML;
+                        }
+                        if (percentageAdd < 100){
+                            let percentages = document.getElementById("percentages").getElementsByTagName("tbody")[0].children;
+                            if (editable == percentages[percentages.length-1].getElementsByTagName("td")){
+                                let newTr = document.createElement("tr");
+                                newTr.innerHTML = "<td contenteditable='true'>...</td><td contenteditable='true'>" + (100-percentageAdd).toString() + "</td>"
+                                document.getElementById("percentages").getElementsByTagName("tbody")[0].appendChild(newTr);
+                            }else{
+                                percentages[percentages.length-1].innerHTML = "<td contenteditable='true'>...</td><td contenteditable='true'>" + (100-percentageAdd).toString() + "</td>"
+                            }
+                        }
+                        setTables()
+                    }
+                }
+            }
+            deleteTables(existent)
+        }
+        function setTables(){
+            createTables()
+            const tables = document.getElementsByTagName("table");
+            for (let i = 0; i < tables.length; i++){
+                const thead = tables[i].getElementsByTagName("thead")[0];
+                thead.onmousedown = (event)=>{
+                    let offsetX = tables[i].style.left.replace("px", "") - event.clientX;
+                    let offsetY = tables[i].style.top.replace("px", "") - event.clientY;
+                    document.body.onmousemove = (ev)=>{
+                        let newX = ev.pageX + offsetX;
+                        let newY = ev.pageY + offsetY;
+                        tables[i].style.left = newX + "px";
+                        tables[i].style.top = newY + "px";
+                    }
+                }
+                tables[i].onclick = ()=>{
+                    for (let j = 0; j < tables.length; j++){
+                        tables[j].style.zIndex = 1;
+                    }
+                    tables[i].style.zIndex = 10;
+                }
+            }
+        }
+        setTables()
+        calculate()
+        document.body.onmouseup = ()=>{document.body.onmousemove = null}
+        document.body.onkeypress = ()=>{
+            setTimeout(calculate, 50);
+        }
+    </script>
+</body>
+</html>
