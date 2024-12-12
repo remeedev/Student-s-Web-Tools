@@ -64,6 +64,13 @@
         </tbody>
         <tfoot></tfoot>
     </table>
+    <svg id="defPin" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
+        <defs>
+        </defs>
+        <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+            <path d="M 89.011 87.739 c -0.599 -1.371 -1.294 -2.652 -1.968 -3.891 l -0.186 -0.343 l -15.853 -15.91 c -0.371 -0.375 -0.746 -0.748 -1.12 -1.12 c -0.671 -0.667 -1.342 -1.335 -1.997 -2.018 l -1.459 -1.437 l 23.316 -23.317 l -1.704 -1.704 c -9.111 -9.112 -22.925 -12.518 -35.353 -8.759 l -6.36 -6.359 c 0.769 -7.805 -2.017 -15.69 -7.503 -21.175 L 37.123 0 L 0 37.122 l 1.706 1.704 c 5.487 5.487 13.368 8.271 21.176 7.503 l 6.36 6.36 C 25.484 65.115 28.889 78.93 38 88.041 l 1.703 1.704 l 23.316 -23.316 l 1.438 1.458 c 0.679 0.653 1.344 1.321 2.009 1.989 c 0.373 0.374 0.745 0.748 1.117 1.116 l 15.699 15.7 l 0.566 0.352 c 1.239 0.673 2.52 1.369 3.891 1.968 L 90 90 L 89.011 87.739 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+        </g>
+    </svg>
     <script defer>
         function addGrade(table){
             tr = document.createElement("tr")
@@ -90,30 +97,78 @@
                 document.getElementById(id)
             );
         }
+        function parseTable(id){
+            let dict = document.getElementById(id).getElementsByTagName("thead")[0].children[1].children.length == 2;
+            if (dict){
+                let result = {};
+                let tbody = document.getElementById(id).getElementsByTagName("tbody")[0].children;
+                for (let i = 0; i<tbody.length;i++){
+                    result[tbody[i].children[0].innerHTML] = +tbody[i].children[1].innerHTML
+                }
+                return result;
+            }else{
+                let result = [];
+                let tbody = document.getElementById(id).getElementsByTagName("tbody")[0].children;
+                for (let i = 0; i<tbody.length;i++){
+                    result.push(+tbody[i].children[0].innerHTML)
+                }
+                return result;
+            }
+        }
+        function values(dict){
+            let val = [];
+            for (var key in dict){
+                val.push(dict[key])
+            }
+            return val;
+        }
+        function makeid(length) {
+            let result = '';
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const charactersLength = characters.length;
+            let counter = 0;
+            while (counter < length) {
+              result += characters.charAt(Math.floor(Math.random() * charactersLength));
+              counter += 1;
+            }
+            return result;
+        }
+        function percentageFix(){
+            let percentages = document.getElementById("percentages").getElementsByTagName("tbody")[0].children;
+            let data = values(parseTable("percentages"))
+            let addUp = 0;
+            for (let i = 0; i < percentages.length; i++){
+                if (addUp >= 100){
+                    document.getElementById("percentages").getElementsByTagName("tbody")[0].removeChild(percentages[i]);
+                    continue;
+                }
+                if (data[i] + addUp >= 100){
+                    percentages[i].children[1].innerHTML = 100-addUp;
+                    addUp = 100;
+                }
+                addUp = addUp + data[i];
+            }
+            if (addUp < 100){
+                let newTr = document.createElement("tr")
+                newTr.innerHTML = "<td contenteditable='true'>" + makeid(5) + "</td><td contenteditable='true'>" + (100-addUp) + "</td>"
+                document.getElementById("percentages").getElementsByTagName("tbody")[0].appendChild(newTr);
+                setTables()
+            }
+        }
         function calculate(){
-            let tables = document.getElementsByClassName("t");
+            let data = parseTable("percentages");
             let finalVal = 0;
-            for (let i = 0; i < tables.length; i++){
-                let current = 0;
-                let body = tables[i].children[1].children;
-                for (let j = 0; j < body.length; j++){
-                    if (body[j].children[0].innerHTML == ""){
-                        tables[i].children[1].removeChild(body[j]);
-                    }
-                    current = current + +body[j].children[0].innerHTML;
+            for (var key in data){
+                let temp = parseTable(key);
+                let tempCalc = 0;
+                for (let i = 0; i < temp.length; i++){
+                    tempCalc = tempCalc + temp[i];
                 }
-                let percentage = document.getElementById("percentages").getElementsByTagName("tbody")[0].children;
-                for (let j = 0; j < percentage.length; j++){
-                    if (percentage[j].children[0].innerHTML == tables[i].id){
-                        percentage = +percentage[j].children[1].innerHTML;
-                    }
-                }
-                current = (current / body.length) * (percentage/100);
-                finalVal = finalVal + current;
+                tempCalc = tempCalc / temp.length;
+                finalVal = finalVal + (tempCalc * (data[key]/100));
             }
             let color;
             let max = +document.getElementById("maxGrade").innerHTML;
-            console.log(max);
             let finalCopy = Math.floor(finalVal*100)/100;
             if (finalVal >= +document.getElementById("minGrade").innerHTML.replace("<br>", "")){
                 color = "green";
@@ -135,8 +190,17 @@
                 return
             }
             let table = document.createElement("table");
-            table.style.top = 200 + Math.floor(Math.random()*(window.innerHeight-250))+"px";
-            table.style.left= Math.floor(Math.random()*(window.innerWidth-250)) + "px";
+            let tables = document.getElementsByClassName("t")
+            let x = 100;
+            let y = 300;
+            for (let i = 0; i < tables.length; i++){
+                if (y == +tables[i].style.top.replace("px", "") && x == +tables[i].style.left.replace("px", "")){
+                    x = x + 20;
+                    y = y + 20;
+                }
+            }
+            table.style.top = y + "px";
+            table.style.left= x + "px";
             table.classList.add("t");
             table.id = name;
             let thead = "<thead><tr><td colspan='" +
@@ -158,7 +222,7 @@
             table.children[1].children[0].children[0].onclick = ()=>{
                 document.body.onkeyup = calculate;
             }
-            addButton(name + "-button", "+", table, addGrade);
+            addButton(name + "-button", "+ Add Grade", table, addGrade);
             document.body.appendChild(table);
         }
         function deleteTables(existent){
@@ -176,39 +240,10 @@
             for (let i = 0; i < percentageTable.length; i++){
                 let tname = percentageTable[i].getElementsByTagName("td")[0].innerHTML;
                 existent.push(tname);
-                createTable(tname, ["grade"], [["100"]]);
+                createTable(tname, ["Grade"], [["100"]]);
                 const editable = percentageTable[i].getElementsByTagName("td");
                 for (let j = 0; j < editable.length; j++){
                     editable[j].contentEditable = "true";
-                }
-                editable[0].onclick = ()=>{
-                    document.body.onkeyup = (ev)=>{
-                        setTables()
-                    }
-                }
-                editable[1].onclick = ()=>{
-                    document.body.onkeyup = ()=>{
-                        calculate()
-                        percentageAdd = 0;
-                        for (let i = 0; i < percentageTable.length; i++){
-                            if (percentageAdd >= 100){
-                                document.getElementById("percentages").getElementsByTagName("tbody")[0].removeChild(percentageTable[i]);
-                                continue;
-                            }
-                            percentageAdd = percentageAdd + +percentageTable[i].getElementsByTagName("td")[1].innerHTML;
-                        }
-                        if (percentageAdd < 100){
-                            let percentages = document.getElementById("percentages").getElementsByTagName("tbody")[0].children;
-                            if (editable == percentages[percentages.length-1].getElementsByTagName("td")){
-                                let newTr = document.createElement("tr");
-                                newTr.innerHTML = "<td contenteditable='true'>...</td><td contenteditable='true'>" + (100-percentageAdd).toString() + "</td>"
-                                document.getElementById("percentages").getElementsByTagName("tbody")[0].appendChild(newTr);
-                            }else{
-                                percentages[percentages.length-1].innerHTML = "<td contenteditable='true'>...</td><td contenteditable='true'>" + (100-percentageAdd).toString() + "</td>"
-                            }
-                        }
-                        setTables()
-                    }
                 }
             }
             deleteTables(existent)
@@ -217,8 +252,24 @@
             createTables()
             const tables = document.getElementsByTagName("table");
             for (let i = 0; i < tables.length; i++){
+                if (tables[i].getElementsByClassName("pin").length == 0){
+                    let pin = document.getElementById("defPin").cloneNode(true);
+                    pin.classList.add("pin")
+                    pin.id = "";
+                    pin.onclick = ()=>{
+                        if (tables[i].classList.contains("pinned")){
+                            tables[i].classList.remove("pinned")
+                        }else{
+                            tables[i].classList.add("pinned")
+                        }
+                    }
+                    tables[i].appendChild(pin)
+                }
                 const thead = tables[i].getElementsByTagName("thead")[0];
                 thead.onmousedown = (event)=>{
+                    if (tables[i].classList.contains("pinned")){
+                        return
+                    }
                     let offsetX = tables[i].style.left.replace("px", "") - event.clientX;
                     let offsetY = tables[i].style.top.replace("px", "") - event.clientY;
                     document.body.onmousemove = (ev)=>{
@@ -239,8 +290,12 @@
         setTables()
         calculate()
         document.body.onmouseup = ()=>{document.body.onmousemove = null}
-        document.body.onkeypress = ()=>{
-            setTimeout(calculate, 50);
+        document.body.onkeyup = ()=>{
+            setTimeout(()=>{
+                setTables();
+                calculate();
+                percentageFix();
+            }, 200);
         }
     </script>
 </body>
