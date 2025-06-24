@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    font-family: "Space Mono", monospace;
+    font-weight: 400;
+    font-style: normal;
+}
+
+:root {
+    --bg: #F2F5EA;
+    --pink: #d2f1c9;
+    --green: #778472;
+}
+
+body {
+    background-color: var(--bg);
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+.space-mono-bold {
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.space-mono-regular-italic {
+  font-family: "Space Mono", monospace;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.space-mono-bold-italic {
+  font-family: "Space Mono", monospace;
+  font-weight: 700;
+  font-style: italic;
+}
+
+header {
+    padding: 10px;
+    box-shadow: 0 0 5px 0px;
+    height: 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+header nav{
+    display: flex;
+    justify-content: end;
+    height: 100%;
+    width: 50%;
+}
+
+.image-link {
+    display: inline-block;
+    width: 8%;
+    border-radius: 5px;
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.image-link:hover{
+    background-color: var(--pink);
+}
+
+.image-link img {
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1/1;
+}
+
+.content {
+    border: 1px solid var(--green);
+    width: 90%;
+    aspect-ratio: 3/1;
+    border-radius: 10000px;
+    margin: 15px auto;
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: inset -2px -5px 10px 0px;
+}
+
+.content:after{
+    content: "";
+    display: block;
+    width: 1px;
+    height: 100%;
+    background-color: var(--green);
+    position: absolute;
+    top: 0;
+    left: 50%;
+}
+
+.text-button {
+    all: unset;
+    cursor: pointer;
+    font-size: 1.2em;
+    border: 2px solid var(--green);
+    padding: 2px 5px;
+    border-radius: 5px;
+    background-color: var(--green);
+    transition: all 0.3s ease;
+}
+
+.text-button:hover {
+    background-color: transparent;
+}

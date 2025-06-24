@@ -3,299 +3,767 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        Grade Calculator
-    </title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" href="https://cdn.icon-icons.com/icons2/1179/PNG/512/1490127523-school-object-study-student3_82096.png" type="image/x-icon">
+    <title>Grade Calculator</title>
+    <link rel="stylesheet" href="./style/grades.css">
+    <link rel="stylesheet" href="./style/style.css">
+    <link rel="shortcut icon" href="./assets/calc.png" type="image/x-icon">
 </head>
 <body>
     <header>
-        <h1>Grade Calculator</h1>
+        <h1 class="space-mono-bold">
+            Student's Web Tools
+        </h1>
+        <nav>
+            <a href="./grades.html" class="image-link"><img src="./assets/calc.png" alt="" srcset=""></a>
+            <a href="./index.html" class="image-link"><img src="./assets/home.png" alt="" srcset=""></a>
+            <a href="" class="image-link"><img src="./assets/gear.png" alt="" srcset="" id="config"></a>
+        </nav>
     </header>
-    <br>
-    <a href="."><button>Back</button></a>
-    <table id="results" style="top: 500px; left: 169px;">
-        <thead>
-            <tr>
-                <td colspan="2">Overall Results</td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style="display: flex; justify-content:center; align-items: center;">
-                    <div class="progress-bar">
-                        <h1 id="num">100</h1><p id="topLim">/100</p>
-                      </div>
-                </td>
-            </tr>
-            <tr>
-                <td>Passing Grade</td>
-            </tr>
-            <tr>
-                <td contenteditable="true" id="minGrade">69</td>
-            </tr>
-            <tr>
-                <td>Max Grade</td>
-            </tr>
-            <tr>
-                <td contenteditable="true" id="maxGrade">100</td>
-            </tr>
-        </tbody>
-    </table>
-    <table id="percentages" style="top: 200px; left: 100px;">
-        <thead>
-            <tr>
-                <td colspan="2">Percentages</td>
-            </tr>
-            <tr>
-                <td>Evaluation</td>
-                <td>%</td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Exam</td>
-                <td>100</td>
-            </tr>
-        </tbody>
-        <tfoot></tfoot>
-    </table>
-    <svg id="defPin" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 256 256" xml:space="preserve">
-        <defs>
-        </defs>
-        <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
-            <path d="M 89.011 87.739 c -0.599 -1.371 -1.294 -2.652 -1.968 -3.891 l -0.186 -0.343 l -15.853 -15.91 c -0.371 -0.375 -0.746 -0.748 -1.12 -1.12 c -0.671 -0.667 -1.342 -1.335 -1.997 -2.018 l -1.459 -1.437 l 23.316 -23.317 l -1.704 -1.704 c -9.111 -9.112 -22.925 -12.518 -35.353 -8.759 l -6.36 -6.359 c 0.769 -7.805 -2.017 -15.69 -7.503 -21.175 L 37.123 0 L 0 37.122 l 1.706 1.704 c 5.487 5.487 13.368 8.271 21.176 7.503 l 6.36 6.36 C 25.484 65.115 28.889 78.93 38 88.041 l 1.703 1.704 l 23.316 -23.316 l 1.438 1.458 c 0.679 0.653 1.344 1.321 2.009 1.989 c 0.373 0.374 0.745 0.748 1.117 1.116 l 15.699 15.7 l 0.566 0.352 c 1.239 0.673 2.52 1.369 3.891 1.968 L 90 90 L 89.011 87.739 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
-        </g>
-    </svg>
+    <div id="alert-center"></div>
+    <div id="query-bg">
+        <div id="query">
+
+        </div>
+    </div>
+    <div id="report">
+        <h1 class="space-mono-bold">Final Report</h1>
+        <div id="progress-bar">[--------------------]</div><br>
+        <a href="" class="text-button" id="reportGen">Generate Report</a><br><br>
+        <label for="">Maximum Grade: </label><input value="0" type="number" onchange="updateSettings()" id="max_grade"><br>
+        <label for="">Passing Grade: </label><input value="0" type="number" id="passing_grade" onchange="updateSettings()">
+        <div id="weights"></div>
+    </div>
+    <div id="canvas">
+
+    </div>
     <script defer>
-        function addGrade(table){
-            tr = document.createElement("tr")
-            tr.innerHTML = "<td contenteditable='true'>100</td>"
-            tr.children[0].onclick = ()=>{
-                document.body.onkeyup = ()=>{
-                    calculate()
-                    if(tr.children[0].innerHTML == ""){
-                        table.children[1].removeChild(tr);
-                    }
-                }
-            }
-            table.children[1].appendChild(tr)
+        // Not optimized for phone
+        if (navigator.userAgentData && navigator.userAgentData.mobile){
+            alert("Phone view is not recommended for this site.");
         }
-        function addButton(id, content, table, onclick){
-            let button = document.createElement("button")
-            button.innerHTML = content;
-            button.id = id;
-            button.onclick = ()=>{onclick(table)};
-            table.getElementsByTagName("tfoot")[0].appendChild(button);
-        }
-        function deleteButton(id){
-            document.getElementById(id).parentElement.removeChild(
-                document.getElementById(id)
-            );
-        }
-        function parseTable(id){
-            let dict = document.getElementById(id).getElementsByTagName("thead")[0].children[1].children.length == 2;
-            if (dict){
-                let result = {};
-                let tbody = document.getElementById(id).getElementsByTagName("tbody")[0].children;
-                for (let i = 0; i<tbody.length;i++){
-                    result[tbody[i].children[0].innerHTML] = +tbody[i].children[1].innerHTML
-                }
-                return result;
+    
+        let info = [];
+        let gradeInfo = {
+            "max_grade":5,
+            "passing_grade":3
+        };
+        let windowInfo = {
+            "title":"",
+            "content":[],
+            "pos":[],
+            "size":[],
+            "elem":undefined,
+            "weight":0
+        };
+        let automaticRecover = false;
+
+        let canvas = document.getElementById("canvas");
+
+        function loadSettings(){
+            if (localStorage.getItem("gradeInfo") == undefined){
+                localStorage.setItem("gradeInfo", JSON.stringify(gradeInfo));
             }else{
-                let result = [];
-                let tbody = document.getElementById(id).getElementsByTagName("tbody")[0].children;
-                for (let i = 0; i<tbody.length;i++){
-                    result.push(+tbody[i].children[0].innerHTML)
+                gradeInfo = JSON.parse(localStorage.getItem("gradeInfo"));
+            }
+            document.getElementById("max_grade").value = gradeInfo.max_grade;
+            document.getElementById("passing_grade").value = gradeInfo.passing_grade;
+        }
+        loadSettings();
+
+        function updateSettings(){
+            document.getElementById("max_grade").value = +document.getElementById("max_grade").value;
+            document.getElementById("passing_grade").value = +document.getElementById("passing_grade").value;
+            gradeInfo.max_grade = +document.getElementById("max_grade").value;
+            gradeInfo.passing_grade = +document.getElementById("passing_grade").value;
+            localStorage.setItem("gradeInfo", JSON.stringify(gradeInfo));
+            updateReport();
+        }
+
+        function pureRecover(){
+            // Recovering data
+            recovery_info = JSON.parse(localStorage.getItem("gradeData"));
+            for (let i = 0; i < recovery_info.length; i++){
+                if (recovery_info[i] == null){
+                    return;
                 }
-                return result;
-            }
-        }
-        function values(dict){
-            let val = [];
-            for (var key in dict){
-                val.push(dict[key])
-            }
-            return val;
-        }
-        function makeid(length) {
-            let result = '';
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            const charactersLength = characters.length;
-            let counter = 0;
-            while (counter < length) {
-              result += characters.charAt(Math.floor(Math.random() * charactersLength));
-              counter += 1;
-            }
-            return result;
-        }
-        function percentageFix(){
-            let percentages = document.getElementById("percentages").getElementsByTagName("tbody")[0].children;
-            let data = values(parseTable("percentages"))
-            let addUp = 0;
-            for (let i = 0; i < percentages.length; i++){
-                if (addUp >= 100){
-                    document.getElementById("percentages").getElementsByTagName("tbody")[0].removeChild(percentages[i]);
+                if (createWindow(recovery_info[i].title, recovery_info[i].weight, recovery_info[i].pos) == -1){
+                    raiseError("Error!", "Error recovering previous session!");
+                    return;
+                }
+                let newWind = getIndexName(recovery_info[i].title);
+                if (newWind == -1){
                     continue;
                 }
-                if (data[i] + addUp >= 100){
-                    percentages[i].children[1].innerHTML = 100-addUp;
-                    addUp = 100;
+                newWind = info[newWind];
+                newWind.content = recovery_info[i].content;
+                dataHolder = newWind.elem.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
+                dataHolder.innerText = recovery_info[i].content.join("\n");
+                if (dataHolder.innerText != ""){
+                    dataHolder.innerText+="\n";
                 }
-                addUp = addUp + data[i];
+                newWind.elem.getElementsByTagName("input")[0].onauxclick();
+                newWind.elem.style.width = recovery_info[i].size[0] + "px";
+                newWind.elem.style.height = dataHolder.offsetHeight;
             }
-            if (addUp < 100){
-                let newTr = document.createElement("tr")
-                newTr.innerHTML = "<td contenteditable='true'>" + makeid(5) + "</td><td contenteditable='true'>" + (100-addUp) + "</td>"
-                document.getElementById("percentages").getElementsByTagName("tbody")[0].appendChild(newTr);
-                setTables()
-            }
+            document.getElementById("query-bg").style.display = "none"; //Testing
+            updateReport();
         }
-        function calculate(){
-            let data = parseTable("percentages");
-            let finalVal = 0;
-            for (var key in data){
-                let temp = parseTable(key);
-                let tempCalc = 0;
-                for (let i = 0; i < temp.length; i++){
-                    tempCalc = tempCalc + temp[i];
-                }
-                tempCalc = tempCalc / temp.length;
-                finalVal = finalVal + (tempCalc * (data[key]/100));
-            }
-            let color;
-            let max = +document.getElementById("maxGrade").innerHTML;
-            let finalCopy = Math.floor(finalVal*100)/100;
-            if (finalVal >= +document.getElementById("minGrade").innerHTML.replace("<br>", "")){
-                color = "green";
-            }else{
-                color = "red";
-            }
-            finalVal = Math.floor((finalVal/max)*10000)/100;
-            document.getElementsByClassName("progress-bar")[0].style.background = "radial-gradient(closest-side, var(--bg) 79%, transparent 80% 100%), conic-gradient(" +
-            color
-            + " " +
-            finalVal +
-            "%, lightgray 0)"
-            document.getElementById("num").innerText = finalCopy;
-            document.getElementById("topLim").innerText = "/" + max;
 
-        }
-        function createTable(name, headers, content){
-            if (document.getElementById(name)){
-                return
+        function recoverData(){
+            if (localStorage.getItem("restoreJam")){
+                return;
             }
-            let table = document.createElement("table");
-            let tables = document.getElementsByClassName("t")
-            let x = 100;
-            let y = 300;
-            for (let i = 0; i < tables.length; i++){
-                if (y == +tables[i].style.top.replace("px", "") && x == +tables[i].style.left.replace("px", "")){
-                    x = x + 20;
-                    y = y + 20;
+            if (localStorage.getItem("gradeData") == undefined){
+                updateReport();
+            }else{
+                if (localStorage.getItem("automaticRecover") != undefined){
+                    automaticRecover = JSON.parse(localStorage.getItem("automaticRecover"));
                 }
-            }
-            table.style.top = y + "px";
-            table.style.left= x + "px";
-            table.classList.add("t");
-            table.id = name;
-            let thead = "<thead><tr><td colspan='" +
-                headers.length + "'>" + name +
-                "</td></tr><tr>"
-            for (let i = 0; i < headers.length; i++){
-                thead = thead + "<td>" + headers[i] + "</td>";
-            }
-            thead = thead + "</tr></thead><tbody>";
-            for (let i = 0; i < content.length; i++){
-                thead = thead + "<tr>";
-                for (let j = 0; j < content[i].length; j++){
-                    thead = thead + "<td contenteditable>" + content[i][j] + "</td>"
-                }
-                thead = thead + "</tr>"
-            }
-            thead = thead + "</tbody><tfoot></tfoot>"
-            table.innerHTML = thead;
-            table.children[1].children[0].children[0].onclick = ()=>{
-                document.body.onkeyup = calculate;
-            }
-            addButton(name + "-button", "+ Add Grade", table, addGrade);
-            document.body.appendChild(table);
-        }
-        function deleteTables(existent){
-            const tables = document.getElementsByClassName("t");
-            for (let i = 0; i < tables.length; i++){
-                if (!existent.includes(tables[i].id)){
-                    document.body.removeChild(tables[i]);
+                if (automaticRecover){
+                    raiseInfo("Automatic Recovery On", "Data is being recovered into position!")
+                    pureRecover();
+                }else{
+                    raiseWarning("Saved Data Found!", "Type 'yes' in the prompt to recover old data! Or type 'YES' to activate automatic recovery!");
+                    getInfo(["Type 'yes' to recover data"], (data)=>{
+                        if (data.length < 1){
+                            raiseError("System Error!", "Function did not recieve enough arguments!");
+                            return;
+                        }
+                        if (data[0] == "YES"){
+                            automaticRecover = true;
+                            localStorage.setItem("automaticRecover", JSON.stringify(automaticRecover));
+                            pureRecover();
+                        }
+                        if (data[0] != "yes"){
+                            return;
+                        }
+                        pureRecover();
+                    });
                 }
             }
         }
-        function createTables(){
-            let percentageTable = document.getElementById("percentages").getElementsByTagName("tbody")[0];
-            percentageTable = percentageTable.getElementsByTagName("tr");
-            let existent = [];
-            for (let i = 0; i < percentageTable.length; i++){
-                let tname = percentageTable[i].getElementsByTagName("td")[0].innerHTML;
-                existent.push(tname);
-                createTable(tname, ["Grade"], [["100"]]);
-                const editable = percentageTable[i].getElementsByTagName("td");
-                for (let j = 0; j < editable.length; j++){
-                    editable[j].contentEditable = "true";
-                }
+
+        recoverData();
+
+        let mousePos = [0, 0];
+        let ticksDragged = 0;
+        document.body.onmousemove = (e)=>{
+            if (clicking){
+                ticksDragged = ticksDragged + 1;
             }
-            deleteTables(existent)
+            mousePos[0] = e.clientX - canvas.offsetLeft;
+            mousePos[1] = e.clientY - canvas.offsetTop;
         }
-        function setTables(){
-            createTables()
-            const tables = document.getElementsByTagName("table");
-            for (let i = 0; i < tables.length; i++){
-                if (tables[i].getElementsByClassName("pin").length == 0){
-                    let pin = document.getElementById("defPin").cloneNode(true);
-                    pin.classList.add("pin")
-                    pin.id = "";
-                    pin.onclick = ()=>{
-                        if (tables[i].classList.contains("pinned")){
-                            tables[i].classList.remove("pinned")
-                        }else{
-                            tables[i].classList.add("pinned")
+        let clicking = false;
+        document.body.onmousedown = (e)=>{
+            ticksDragged = 0;
+            clicking = true;
+        }
+
+        document.body.onmouseup = (e)=>{
+            clicking = false;
+        }
+
+        function getIndexName(name){
+            let pos = 0;
+            while (pos < info.length){
+                if (info[pos].title == name){
+                    return pos;
+                }
+                pos = pos + 1;
+            }
+            return -1;
+        }
+
+        function deleteWindow(name){
+            getInfo([`Type "${name}" to delete!`], (data)=>{
+                if (data.length < 1){
+                    raiseError("System Error!", "Didn't receive the information!");
+                    return;
+                }
+                if (data[0] != name){
+                    raiseWarning("Name Error!", "You typed the wrong name!");
+                    return;
+                }
+                document.getElementById("query-bg").style.display = "none";
+                let index = getIndexName(name);
+                if (index != -1){
+                    canvas.removeChild(info[index].elem);
+                    info.splice(index, 1);
+                    console.log(info);
+                }
+                updateReport();
+            })
+        }
+
+        function createWindow(name, weight, pos){
+            if (getIndexName(name) != -1){
+                return -1;
+            }
+            let newWindow = document.createElement("div");
+            newWindow.classList.add("window");
+
+            if (pos == undefined){
+                newWindow.style.top = mousePos[1] + "px";
+                newWindow.style.left = mousePos[0] + "px";
+                pos = mousePos;
+            }else{
+                newWindow.style.top = pos[1] + "px";
+                newWindow.style.left = pos[0] + "px";
+            }
+
+            let windowHead = document.createElement("nav");
+            let windowTitle = document.createElement("p");
+            windowTitle.innerText = name;
+            let windowClose = document.createElement("button");
+            windowClose.innerText = "X";
+            windowClose.classList.add("text-button");
+            windowClose.onclick = ()=>{
+                deleteWindow(name);
+            }
+            windowHead.appendChild(windowTitle);
+            windowHead.appendChild(windowClose);
+            newWindow.appendChild(windowHead);
+
+            // INFORMATION UPLOAD
+            let information = { ...windowInfo };
+            information.title = name;
+            information.weight = weight;
+            information.pos = pos;
+            information.elem = newWindow;
+            information.content = [];
+
+            let content = document.createElement("div");
+            content.classList.add("windowContent");
+            let magicOut = document.createElement("div");
+            let magicOF = document.createElement("div"); // overflow
+            let magicInput = document.createElement("input");
+            magicInput.type = "number";
+            magicInput.placeholder = "+ Add Grade"
+            let magicIndex = 0;
+            magicInput.onauxclick = ()=>{
+                magicIndex = magicOut.innerText.split("\n").length-1;
+                console.log(magicIndex);
+            }
+            magicInput.onchange = ()=>{
+                if (magicInput.value == ""){
+                    // UP ARROW
+                    let last_line = magicOut.innerText.split("\n");
+                    if (last_line.length < 2){
+                        return;
+                    }
+                    let newMagicOut = "";
+                    for (let i = 0; i < last_line.length-2; i++){
+                        newMagicOut = newMagicOut + last_line[i].toString() + "\n";
+                    }
+                    last_line = last_line[last_line.length-2];
+                    magicOut.innerText = newMagicOut;
+                    if (magicInput.value != ""){
+                        magicOF.innerText = magicInput.value + "\n" + magicOF.innerText;
+                    }
+                    magicInput.value = last_line;
+                    information.content.splice(magicIndex, 1);
+                    updateReport();
+                    return;
+                }
+                if (+magicInput.value > gradeInfo.max_grade){
+                    magicInput.value = gradeInfo.max_grade;
+                }
+                magicIndex = magicIndex + 1;
+                information.content.splice(magicIndex, magicIndex == information.content.length ? 0 : 1, +magicInput.value);
+                magicOut.innerText = magicOut.innerText + magicInput.value + "\n";
+                let splitted_text = magicOF.innerText.split("\n");
+                magicInput.value = splitted_text[0];
+                let newOF = "";
+                for (let i = 1; i < splitted_text.length; i++){
+                    if (splitted_text[i] == ""){
+                        continue;
+                    }
+                    newOF = newOF + splitted_text[i] + "\n";
+                }
+                magicOF.innerText = newOF;
+                newWindow.style.height = content.style.height;
+                information.size[1] = newWindow.style.height;
+                updateReport();
+            }
+            magicInput.onkeydown = (e)=>{
+                if (e.keyCode == 38 || e.keyCode == 40) {
+                    e.preventDefault()
+                }
+                if (e.keyCode == 38){
+                    // UP ARROW
+                    let last_line = magicOut.innerText.split("\n");
+                    if (last_line.length < 2){
+                        return;
+                    }
+                    if (magicInput.value == ""){
+                        information.content.splice(magicIndex, 1);
+                        updateReport();
+                    }else{
+                        if (+magicInput.value > gradeInfo.max_grade){
+                            magicInput.value = gradeInfo.max_grade;
+                            information.content[magicIndex] = +magicInput.value;
+                            updateReport();
                         }
                     }
-                    tables[i].appendChild(pin)
+                    magicIndex = magicIndex - 1;
+                    let newMagicOut = "";
+                    for (let i = 0; i < last_line.length-2; i++){
+                        newMagicOut = newMagicOut + last_line[i].toString() + "\n";
+                    }
+                    last_line = last_line[last_line.length-2];
+                    magicOut.innerText = newMagicOut;
+                    if (magicInput.value != ""){
+                        magicOF.innerText = magicInput.value + "\n" + magicOF.innerText;
+                    }
+                    magicInput.value = last_line;
                 }
-                const thead = tables[i].getElementsByTagName("thead")[0];
-                thead.onmousedown = (event)=>{
-                    if (tables[i].classList.contains("pinned")){
-                        return
+                if (e.keyCode == 40){
+                    // DOWN ARROW
+                    if (magicInput.value == ""){
+                        return;
+                    }else{
+                        if (+magicInput.value > gradeInfo.max_grade){
+                            magicInput.value = gradeInfo.max_grade;
+                            information.content[magicIndex] = +magicInput.value;
+                            updateReport();
+                        }
                     }
-                    let offsetX = tables[i].style.left.replace("px", "") - event.clientX;
-                    let offsetY = tables[i].style.top.replace("px", "") - event.clientY;
-                    document.body.onmousemove = (ev)=>{
-                        let newX = ev.pageX + offsetX;
-                        let newY = ev.pageY + offsetY;
-                        tables[i].style.left = newX + "px";
-                        tables[i].style.top = newY + "px";
+                    magicIndex = magicIndex + 1;
+                    magicOut.innerText = magicOut.innerText + magicInput.value + "\n";
+                    let splitted_text = magicOF.innerText.split("\n");
+                    magicInput.value = splitted_text[0];
+                    let newOF = "";
+                    for (let i = 1; i < splitted_text.length; i++){
+                        if (splitted_text[i] == ""){
+                            continue;
+                        }
+                        newOF = newOF + splitted_text[i] + "\n";
                     }
-                }
-                tables[i].onclick = ()=>{
-                    for (let j = 0; j < tables.length; j++){
-                        tables[j].style.zIndex = 1;
-                    }
-                    tables[i].style.zIndex = 10;
+                    magicOF.innerText = newOF;
                 }
             }
+            content.appendChild(magicOut);
+            content.appendChild(magicInput);
+            content.appendChild(magicOF);
+            content.onclick = (e)=>{e.stopPropagation()}
+            content.onmousedown = (e)=>{e.stopPropagation()}
+            newWindow.appendChild(content);
+
+
+            newWindow.onclick = (e)=>{e.stopPropagation();}
+            let offsetX = 0;
+            let offsetY = 0;
+            let startX = 0;
+            let startY = 0;
+
+            let moving = false;
+            let changeWidth = false;
+            let changeHeight = false;
+            let relativePos = [0, 0];
+            newWindow.onmousedown = (e)=>{
+                if (relativePos[1] + 100 >= e.clientY){
+                    offsetX = e.clientX;
+                    offsetY = e.clientY;
+                    startX = newWindow.style.left;
+                    startX = +(startX.substr(0, startX.length - 2));
+                    startY = newWindow.style.top;
+                    startY = +(startY.substr(0, startY.length - 2));
+                    moving = true;
+                    return;
+                }
+                if (relativePos[0]+newWindow.offsetWidth-50 <= e.clientX){
+                    changeWidth = true;
+                    offsetX = mousePos[0];
+                    startX = newWindow.offsetWidth;
+                }
+                if (relativePos[1]+newWindow.offsetHeight-50 <= mousePos[1]){
+                    changeHeight = true;
+                    offsetY = mousePos[1];
+                    startY = newWindow.offsetHeight;
+                }
+            }
+            newWindow.onmouseup = ()=>{
+                moving = false;
+                changeWidth = false;
+                changeHeight = false;
+            }
+            newWindow.onmouseleave = newWindow.onmouseup;
+            newWindow.onmousemove = (e)=>{
+                if (moving){
+                    let newLeft = (startX + (e.clientX - offsetX));
+                    newLeft = newLeft < 0 ? 0 : newLeft;
+                    newLeft = newLeft > canvas.offsetWidth-newWindow.offsetWidth ? canvas.offsetWidth-newWindow.offsetWidth : newLeft;
+                    let newTop = (startY + (e.clientY - offsetY));
+                    newTop = newTop < 0 ? 0 : newTop;
+                    newTop = newTop > canvas.offsetHeight-newWindow.offsetHeight ? canvas.offsetHeight-newWindow.offsetHeight : newTop;
+                    newWindow.style.left = newLeft + "px";
+                    newWindow.style.top = newTop + "px";
+                    information.pos = [newLeft, newTop];
+                }
+                if (changeWidth){
+                    let newWidth = (startX + (mousePos[0] - offsetX));
+                    newWidth = newWidth < 150 ? 150 : newWidth;
+                    newWindow.style.width = newWidth + "px";
+                    information.size[0] = newWidth;
+                }
+                if (changeHeight){
+                    let newHeight = (startY + (mousePos[1] - offsetY));
+                    newHeight = newHeight < 75 ? 75 : newHeight;
+                    newWindow.style.height = newHeight + "px";
+                    content.style.height = (newHeight * 0.75) + "px";
+                    information.size[1] = newHeight;
+                }
+                relativePos = [newWindow.offsetLeft, newWindow.offsetTop]
+                updateReport();
+            }
+            canvas.appendChild(newWindow);
+            magicInput.focus();
+            information.size = [newWindow.offsetWidth, newWindow.offsetHeight];
+            info.push(information);
+            return 0;
         }
-        setTables()
-        calculate()
-        document.body.onmouseup = ()=>{document.body.onmousemove = null}
-        document.body.onkeyup = ()=>{
-            setTimeout(()=>{
-                setTables();
-                calculate();
-                percentageFix();
-            }, 200);
+
+        function getInfo(requested, outFunc){
+            let query = document.getElementById("query");
+            query.innerHTML = "";
+
+            query.onclick = (e)=>{e.stopPropagation()}
+
+            for (let i = 0; i < requested.length; i++){
+                let element = requested[i];
+                let input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = element;
+                query.appendChild(input);
+            }
+
+            let submit = document.createElement("button");
+            let bg = document.getElementById("query-bg");
+
+            submit.onclick = ()=>{
+                let data = [];
+                let queries = query.getElementsByTagName("input");
+                for(let i = 0; i < queries.length; i++){
+                    let element = queries[i];
+                    if (element.value == "") {
+                        raiseWarning("Query Values", "All Query values must be filled!");
+                        return;
+                    }
+                    data.push(element.value);
+                }
+                outFunc(data);
+            }
+
+            let entries = query.getElementsByTagName("input");
+            for (let i = 0; i < entries.length-1; i++){
+                let elem = entries[i];
+                entries[i].onchange = ()=>{entries[i+1].focus()}
+            }
+            entries[entries.length - 1].onchange = submit.onclick;
+
+            submit.innerText = "Submit"
+            query.appendChild(submit);
+            bg.style.display = "flex";
+            bg.onclick = ()=>{bg.style.display = "none"}
+            query.getElementsByTagName("input")[0].focus()
+        }
+
+        function processWindow(data){
+            if (data.length < 2){
+                raiseError("System Error!", "Function was passed too few arguments!");
+                return;
+            }
+            if (data[0].length > 15){
+                raiseError("Error!", "Assignment name too long!");
+                return;
+            }
+            if (isNaN(+data[1])){
+                raiseError("Error!", "Assignment weight must be number!");
+                return;
+            }
+            if (createWindow(data[0], +data[1], undefined) == -1){
+                raiseError("Error!", "Assignment name already taken!");
+                return;
+            }
+            document.getElementById("query-bg").style.display = "none";
+            updateReport()
+        }
+
+        function updateReport(){
+            let out = "Log:\n";
+            let total = 0;
+            let outGrade = 0;
+            out = out + "Calculated Weight of Assignments:\n";
+            info.forEach(element => {
+                let localGrade = 0;
+                out = `${out}${element.title} -> ${element.weight}%\n`
+                element.content.forEach(elem=>{
+                    elem = elem < 0 ? 0 : elem;
+                    elem = elem > gradeInfo.max_grade ? gradeInfo.max_grade : elem;
+                    localGrade = localGrade + elem;
+                    out = `${out}Added grade: ${elem}\n`;
+                })
+                localGrade = localGrade/element.content.length;
+                out = `${out}Local Grade: ${localGrade}\n`;
+                outGrade = outGrade + localGrade*(element.weight/100);
+                total = total + element.weight;
+            });
+            outGrade = isNaN(outGrade) ? 0 : outGrade;
+            out = `${out}Calculated Grade: ${outGrade}\n`;
+            if (total < 100){
+                out = `${out}Weight Auto Filled -> ${100-total}%\n`
+            }
+            outGrade = (outGrade * 100)/total;
+            outGrade = isNaN(outGrade) ? 0 : outGrade;
+            out = `${out}Grade After Rule of 3rds: ${outGrade}\n`;
+            out = `${out}${outGrade}`;
+            if (outGrade >= gradeInfo.passing_grade){
+                out = `${out} is a passing grade!\n`
+            }else{
+                out = `${out} is not a passing grade\n`
+            }
+            out = `${out} saving report...\n`
+            localStorage.setItem("gradeData", JSON.stringify(info));
+            out = `${out} report saved!\n`;
+            document.getElementById("weights").innerText = out;
+            let pb = document.getElementById("progress-bar");
+            let outProgress = "[";
+            let perc = (outGrade/gradeInfo.max_grade)*20;
+            for (let i = 0; i < perc; i++){
+                outProgress = outProgress + "X";
+            }
+            let antiPerc = 20-perc;
+            for (let i = 0; i < antiPerc; i++){
+                outProgress = outProgress + "-";
+            }
+            outProgress = outProgress + `] ${Math.floor(outGrade*100)/100}/${gradeInfo.max_grade}`
+            pb.innerText = outProgress;
+            let reportGen = document.getElementById("reportGen");
+            reportGen.innerText = "Generate Report";
+            reportGen.href = "";
+            reportGen.removeAttribute("download")
+            reportGen.onclick = (e)=>{
+                e.preventDefault();
+                createReport();
+                reportGen.onclick = ()=>{}
+            }
+            
+        }
+
+        function fillAlertText(title, text){
+            let centre = document.getElementById("alert-center");
+            centre.innerHTML = "";
+
+            let titleHandle = document.createElement("h1");
+            let textHandle = document.createElement("p");
+            titleHandle.innerText = title;
+            textHandle.innerText = text;
+
+            centre.appendChild(titleHandle);
+            centre.appendChild(textHandle);
+        }
+
+        function raiseWarning(errorTitle, errorText){
+            let centre = document.getElementById("alert-center");
+            centre.classList.add("warning");
+            fillAlertText(errorTitle, errorText);
+            setTimeout(()=>{centre.classList.remove("warning")}, 1500);
+        }
+
+        function raiseError(errorTitle, errorText){
+            let centre = document.getElementById("alert-center");
+            centre.classList.add("error");
+            fillAlertText(errorTitle, errorText);
+            setTimeout(()=>{centre.classList.remove("error")}, 1500);
+        }
+
+        function raiseInfo(infoTitle, infoText){
+            let centre = document.getElementById("alert-center");
+            centre.classList.add("info");
+            fillAlertText(infoTitle, infoText);
+            setTimeout(()=>{centre.classList.remove("info")}, 1500);
+        }
+
+        function createReport(){
+            var reportCanvas = document.createElement("canvas");
+            let reportGen = document.getElementById("reportGen");
+            reportGen.innerText = "Generating Report...";
+
+            reportCanvas.width = 800;
+            reportCanvas.height = 10000;
+
+            var ctx = reportCanvas.getContext("2d");
+            ctx.beginPath();
+
+            // Background
+            ctx.rect(0, 0, reportCanvas.width, reportCanvas.height);
+            ctx.fillStyle = "snow";
+            ctx.fill();
+
+            // Text
+            ctx.font = "bold 48px 'Space Mono', monospace";
+            ctx.fillStyle = "black";
+            let metrics = ctx.measureText("Grade Report");
+            let height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+            ctx.fillText("Grade Report", 15, height);
+
+            let currHeight = height;
+            ctx.font = "24px 'Space Mono', monospace";
+            metrics = ctx.measureText("Grade by Weight:");
+            height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 15;
+            currHeight += height;
+            ctx.fillText("Grade by Weight:", 25, currHeight);
+
+            let gradeHeight = 0;
+            let gradeMetrics = `Max Grade: ${gradeInfo.max_grade}`;
+            metrics = ctx.measureText(gradeMetrics);
+            height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 5;
+            gradeHeight+=height;
+            ctx.fillText(gradeMetrics, reportCanvas.width - 10 - metrics.width, height);
+            gradeMetrics = `Passing Grade: ${gradeInfo.passing_grade}`;
+            metrics = ctx.measureText(gradeMetrics);
+            height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 5;
+            gradeHeight+=height;
+            ctx.fillText(gradeMetrics, reportCanvas.width - 10 - metrics.width, gradeHeight);
+
+            ctx.font = "bold 20px 'Space Mono', monospace";
+
+            let percAdd = 0;
+            let finalGrade = 0;
+
+            info.forEach(elem=>{
+                let sectionHeight = 0;
+                let maxWidth = reportCanvas.width-50;
+                let titleText = `${elem.title} - ${elem.weight}%`;
+                metrics = ctx.measureText(titleText);
+                height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 15;
+                currHeight+=height;
+                ctx.fillText(titleText, 30, currHeight);
+                let calc = 0;
+                percAdd+=elem.weight;
+                elem.content.forEach(element=>{
+                    let text = `${element}`;
+                    metrics = ctx.measureText(text);
+                    height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 10;
+                    calc += element;
+                    sectionHeight += height;
+                    ctx.fillText(text, 30, currHeight+sectionHeight);
+                })
+                ctx.strokeRect(25, currHeight+5, maxWidth+5, sectionHeight);
+                currHeight+=sectionHeight;
+                calc /= elem.content.length;
+                calc *= elem.weight/100;
+                finalGrade += calc;
+                let text = `Calculated Segment: ${Math.floor(calc*100)/100}`;
+                metrics = ctx.measureText(text);
+                height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 10;
+                currHeight+=height;
+                ctx.fillText(text, 30, currHeight);
+            })
+            
+            currHeight+=5;
+            ctx.strokeRect(10, currHeight, reportCanvas.width-20, 1);
+
+            if (percAdd < 100){
+                let text = `Missing ${100-percAdd}%`;
+                metrics = ctx.measureText(text);
+                height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 10;
+                currHeight+=height;
+                ctx.fillText(text, 30, currHeight);
+                finalGrade = (finalGrade*100)/percAdd;
+            }
+
+            let text = `Final Grade: ${Math.floor(finalGrade*100)/100}`;
+            metrics = ctx.measureText(text);
+            height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent + 10;
+            currHeight+=height;
+            ctx.fillText(text, 30, currHeight);
+            
+            // Stamp
+            let stampCanvas = document.createElement("canvas");
+            stampCanvas.width = 180;
+            stampCanvas.height = 180;
+            let stampCtx = stampCanvas.getContext("2d");
+
+            let finalScore = finalGrade >= gradeInfo.passing_grade ? "passed" : "failed";
+            stampCtx.beginPath();
+            stampCtx.fillStyle = finalScore == "passed" ? "green" : "red";
+            finalScore = finalScore.toUpperCase();
+            stampCtx.arc(90, 90, 80, 0, 2 * Math.PI);
+            stampCtx.fill();
+
+            stampCtx.globalCompositeOperation = "destination-out";
+            stampCtx.beginPath();
+            stampCtx.arc(90, 90, 65, 0, 2 * Math.PI);
+            stampCtx.fill();
+            stampCtx.fillRect(0, 70, stampCanvas.width, 40);
+            stampCtx.globalCompositeOperation = "source-over";
+            stampCtx.beginPath();
+            stampCtx.arc(90, 90, 60, 0, 2*Math.PI);
+            stampCtx.fill();
+            stampCtx.fillRect(0, 75, stampCanvas.width, 30);
+            stampCtx.globalCompositeOperation = "destination-out";
+            stampCtx.fillRect(0, 70, stampCanvas.width, 5);
+            stampCtx.fillRect(0, 105, stampCanvas.width, 5);
+
+            stampCtx.font = "bold 30px 'Pirata One', serif";
+            metrics = stampCtx.measureText(finalScore);
+            height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+            stampCtx.fillText(finalScore, (stampCanvas.width-metrics.width)/2, (stampCanvas.height+height)/2);
+
+            ctx.globalAlpha = 0.4;
+            ctx.save();
+            const rotAngle = Math.random() * (Math.PI/2) - Math.PI/4;
+            const dx = Math.floor(Math.random()*(reportCanvas.width - stampCanvas.width));
+            const dy = Math.floor(Math.random()*(currHeight - stampCanvas.height));
+            ctx.translate(dx + stampCanvas.width / 2, dy + stampCanvas.height / 2);
+            ctx.rotate(rotAngle);
+            ctx.drawImage(stampCanvas, -stampCanvas.width / 2, -stampCanvas.height / 2 );
+            ctx.restore();
+
+            // Fixing canvas size
+            let outCanvas = document.createElement("canvas");
+            outCanvas.width = reportCanvas.width;
+            outCanvas.height = currHeight + 20;
+            outCanvas.getContext("2d").drawImage(reportCanvas, 0, 0);
+
+            let reportUrl = outCanvas.toDataURL();
+            reportGen.download = "report.png";
+            reportGen.innerText = "Download Report";
+            reportGen.href = reportUrl;
+        }
+
+        canvas.onclick = ()=>{
+            if (ticksDragged > 10) return;
+            getInfo(["Assignment Name", "Assignment Weight"], processWindow);
+        };
+
+        document.getElementById("config").onclick = (e)=>{
+            raiseInfo("Stop trying to recover!", "If you type 'no' in the prompt you will stop recovering completely! And 'clear' will empty your data stored!")
+            getInfo([`Type 'yes' to ${automaticRecover ? "stop using automatic recover" : "start using automatic recover"}`], (data)=>{
+                if (data.length < 1){
+                    raiseError("System Error!", "Not enough arguments were passed!");
+                }
+                if (data[0] == "yes"){
+                    if (localStorage.getItem("restoreJam")){
+                        localStorage.removeItem("restoreJam");
+                        automaticRecover = false;
+                    }
+                    automaticRecover = !automaticRecover;
+                    localStorage.setItem("automaticRecover", JSON.stringify(automaticRecover));
+                    raiseInfo("Automatic Recover", `Automatic Recover is now set to ${automaticRecover}`);
+                }
+                if (data[0] == "no"){
+                    localStorage.setItem("restoreJam", "hello, world!");
+                    raiseInfo("No backup!", "Since you disabled recover you will have no backup!");
+                }
+                if (data[0]=="clear"){
+                    localStorage.clear();
+                }
+                document.getElementById("query-bg").style.display = "none";
+            })
+            e.preventDefault();
         }
     </script>
 </body>
