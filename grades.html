@@ -37,9 +37,14 @@
 
     </div>
     <script defer>
+
         // Not optimized for phone
         if (navigator.userAgentData && navigator.userAgentData.mobile){
             alert("Phone view is not recommended for this site.");
+        }
+
+        document.onkeyup = (ev)=> {
+            if (ev.keyCode == 27) document.getElementById("query-bg").style.display = "none";
         }
     
         let info = [];
@@ -103,7 +108,6 @@
                 }
                 newWind.elem.getElementsByTagName("input")[0].onauxclick();
                 newWind.elem.style.width = recovery_info[i].size[0] + "px";
-                newWind.elem.style.height = dataHolder.offsetHeight;
             }
             document.getElementById("query-bg").style.display = "none"; //Testing
             updateReport();
@@ -244,6 +248,12 @@
             magicInput.onauxclick = ()=>{
                 magicIndex = magicOut.innerText.split("\n").length-1;
                 console.log(magicIndex);
+            }
+            magicInput.onkeyup = (ev)=>{
+                if (ev.keyCode != 8) return;
+                if (magicInput.innerText != "") return;
+                if (magicOut.innerText.split("\n").length == 1) return;
+                magicInput.onchange();
             }
             magicInput.onchange = ()=>{
                 if (magicInput.value == ""){
@@ -430,12 +440,17 @@
 
             query.onclick = (e)=>{e.stopPropagation()}
 
+            let last = null;
             for (let i = 0; i < requested.length; i++){
                 let element = requested[i];
                 let input = document.createElement("input");
                 input.type = "text";
                 input.placeholder = element;
                 query.appendChild(input);
+                if (last){
+                    last.onchange = ()=>{input.focus()}
+                }
+                last = input;
             }
 
             let submit = document.createElement("button");
@@ -490,25 +505,49 @@
             updateReport()
         }
 
+        function getWindowValues(window_name){
+            let windows = document.getElementsByClassName("window")
+            for (let i = 0; i < windows.length; i++) {
+                let title_bar = windows[i].getElementsByTagName("nav")[0];
+                let title = title_bar.children[0];
+                if (title.innerText == window_name) {
+                    let holster = windows[i].getElementsByTagName("div")[0];
+                    let data = holster.children[0];
+                    let tmp = data.innerText.split("\n").reverse().splice(1).reverse();
+                    let out = [];
+                    for (let j = 0; j < tmp.length; j++) out.push(+tmp[j]);
+                    return out;
+                }
+            }
+            return null;
+        }
+
         function updateReport(){
             let out = "Log:\n";
             let total = 0;
             let outGrade = 0;
             out = out + "Calculated Weight of Assignments:\n";
-            info.forEach(element => {
+            console.log(info)
+            for (let i = 0; i < info.length; i++){
+                let element = info[i];
                 let localGrade = 0;
                 out = `${out}${element.title} -> ${element.weight}%\n`
-                element.content.forEach(elem=>{
+                let values = getWindowValues(element.title);
+                console.log(values)
+                for (let j = 0; j < values.length; j++){
+                    let elem = values[j];
                     elem = elem < 0 ? 0 : elem;
                     elem = elem > gradeInfo.max_grade ? gradeInfo.max_grade : elem;
                     localGrade = localGrade + elem;
                     out = `${out}Added grade: ${elem}\n`;
-                })
+                }
                 localGrade = localGrade/element.content.length;
                 out = `${out}Local Grade: ${localGrade}\n`;
                 outGrade = outGrade + localGrade*(element.weight/100);
                 total = total + element.weight;
-            });
+            }
+            info.forEach(element => {
+                            });
             outGrade = isNaN(outGrade) ? 0 : outGrade;
             out = `${out}Calculated Grade: ${outGrade}\n`;
             if (total < 100){
@@ -568,21 +607,21 @@
             let centre = document.getElementById("alert-center");
             centre.classList.add("warning");
             fillAlertText(errorTitle, errorText);
-            setTimeout(()=>{centre.classList.remove("warning")}, 1500);
+            setTimeout(()=>{centre.classList.remove("warning")}, 5000);
         }
 
         function raiseError(errorTitle, errorText){
             let centre = document.getElementById("alert-center");
             centre.classList.add("error");
             fillAlertText(errorTitle, errorText);
-            setTimeout(()=>{centre.classList.remove("error")}, 1500);
+            setTimeout(()=>{centre.classList.remove("error")}, 5000);
         }
 
         function raiseInfo(infoTitle, infoText){
             let centre = document.getElementById("alert-center");
             centre.classList.add("info");
             fillAlertText(infoTitle, infoText);
-            setTimeout(()=>{centre.classList.remove("info")}, 1500);
+            setTimeout(()=>{centre.classList.remove("info")}, 5000);
         }
 
         function createReport(){
