@@ -36,6 +36,9 @@
     <div id="canvas">
 
     </div>
+    <div id="fillLast" style="display:none">
+        <p>Complete last grade</p>
+    </div>
     <script defer>
 
         // Not optimized for phone
@@ -505,6 +508,41 @@
             updateReport()
         }
 
+        document.getElementById("fillLast").onclick = ()=>{
+            let to_add = -1;
+            let curr_grade = 0;
+            let local_grade = 0;
+            for (let i = 0; i < info.length; i++){
+                if (info[i].content.length == 0) {
+                    to_add = i;
+                    continue;
+                }
+                local_grade = 0;
+                for (let j = 0; j < info[i].content.length; j++) local_grade += info[i].content[j]
+                local_grade /= info[i].content.length;
+                local_grade *= (info[i].weight/100);
+                curr_grade += local_grade;
+            }
+            if (to_add == -1) return;
+            let weight = info[to_add].weight;
+            let passing_grade = +document.getElementById("passing_grade").value;
+            console.log("passing: " + passing_grade)
+            let to_get = passing_grade - curr_grade;
+            to_get /= weight/100;
+            let to_show = Math.ceil(to_get*100)/100;
+            let windows = document.getElementsByClassName("window");
+            for (let i = 0; i < windows.length; i++) {
+                let title_bar = windows[i].getElementsByTagName("nav")[0];
+                let title = title_bar.children[0];
+                if (title.innerText == info[to_add].title) {
+                    let holster = windows[i].getElementsByTagName("div")[0];
+                    let data = holster.children[0];
+                    holster.children[0].innerText = to_show + "\n";
+                }
+            }
+            updateReport();
+        };
+
         function getWindowValues(window_name){
             let windows = document.getElementsByClassName("window")
             for (let i = 0; i < windows.length; i++) {
@@ -519,7 +557,7 @@
                     return out;
                 }
             }
-            return null;
+            return [];
         }
 
         function updateReport(){
@@ -527,6 +565,7 @@
             let total = 0;
             let outGrade = 0;
             out = out + "Calculated Weight of Assignments:\n";
+            let can_fill = 0;
             for (let i = 0; i < info.length; i++){
                 let element = info[i];
                 let localGrade = 0;
@@ -534,6 +573,9 @@
                 let values = getWindowValues(element.title);
                 info[i].content = values;
                 element = info[i]; // jic
+                if (values.length == 0) {
+                    can_fill++;
+                }
                 for (let j = 0; j < values.length; j++){
                     let elem = values[j];
                     elem = elem < 0 ? 0 : elem;
@@ -545,6 +587,11 @@
                 out = `${out}Local Grade: ${localGrade}\n`;
                 outGrade = outGrade + localGrade*(element.weight/100);
                 total = total + element.weight;
+            }
+            if (can_fill == 1){
+                document.getElementById("fillLast").style.display = "";
+            }else{
+                document.getElementById("fillLast").style.display = "none";
             }
             outGrade = isNaN(outGrade) ? 0 : outGrade;
             out = `${out}Calculated Grade: ${outGrade}\n`;
@@ -586,6 +633,10 @@
                 reportGen.onclick = ()=>{}
             }
             
+        }
+        
+        function checkFillLast(){
+
         }
 
         function fillAlertText(title, text){

@@ -11,6 +11,7 @@
 :root {
     --bg: light-dark(#0D0A15, #F2F5EA);
     --bg-shadow: light-dark(rgba(14, 11, 21, 0.5), rgba(242, 245, 235, 0.5));
+    --highlight: light-dark(#12A5FE, #FEF809);
     --text: light-dark(#F2F5EA, #0D0A15);
     --pink: #d2f1c9;
     --green: #778472;
