@@ -252,7 +252,16 @@
                 magicIndex = magicOut.innerText.split("\n").length-1;
                 console.log(magicIndex);
             }
+            magicInput.onfocus = ()=>{
+                let jaja = "nothing-phone";
+                let test = document.getElementById(jaja);
+                if (test) return;
+                magicInput.id = jaja;
+                raiseInfo("Shift Shortcut", "Sometimes update report doesn't happen, you can force it while typing by pressing shift.");
+            }
             magicInput.onkeyup = (ev)=>{
+                console.log(ev.keyCode);
+                if (ev.keyCode == 16) updateReport();
                 if (ev.keyCode != 8) return;
                 if (magicInput.innerText != "") return;
                 if (magicOut.innerText.split("\n").length == 1) return;
@@ -526,7 +535,6 @@
             if (to_add == -1) return;
             let weight = info[to_add].weight;
             let passing_grade = +document.getElementById("passing_grade").value;
-            console.log("passing: " + passing_grade)
             let to_get = passing_grade - curr_grade;
             to_get /= weight/100;
             let to_show = Math.ceil(to_get*100)/100;
