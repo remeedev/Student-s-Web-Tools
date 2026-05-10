@@ -527,13 +527,13 @@
             let total = 0;
             let outGrade = 0;
             out = out + "Calculated Weight of Assignments:\n";
-            console.log(info)
             for (let i = 0; i < info.length; i++){
                 let element = info[i];
                 let localGrade = 0;
                 out = `${out}${element.title} -> ${element.weight}%\n`
                 let values = getWindowValues(element.title);
-                console.log(values)
+                info[i].content = values;
+                element = info[i]; // jic
                 for (let j = 0; j < values.length; j++){
                     let elem = values[j];
                     elem = elem < 0 ? 0 : elem;
@@ -546,8 +546,6 @@
                 outGrade = outGrade + localGrade*(element.weight/100);
                 total = total + element.weight;
             }
-            info.forEach(element => {
-                            });
             outGrade = isNaN(outGrade) ? 0 : outGrade;
             out = `${out}Calculated Grade: ${outGrade}\n`;
             if (total < 100){
